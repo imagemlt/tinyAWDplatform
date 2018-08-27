@@ -42,7 +42,12 @@ def treatflag():
     #写回数据到redis中
     redis_store.hset('teams',attacker['id'],json.dumps(attacker))
     redis_store.hset('teams',attacked['id'],json.dumps(attacked))
-    redis_store.rpush('attack',json.dumps({'attacker':attacker['id'],'attacked':attacked['id'],'chal':chal['id'],'time':str(datetime.datetime.utcnow())}))
+    redis_store.rpush('attack',json.dumps({
+        'attacker':attacker['id'],
+        'attacked':attacked['id'],
+        'chal':chal['id'],
+        'time':str(datetime.datetime.utcnow())
+    }))
     return jsonify({'status':'success'})
 
 

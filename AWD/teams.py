@@ -3,6 +3,7 @@ import hashlib
 import json
 from models import *
 from redisConn import redis_store
+from flask_wtf.csrf import generate_csrf
 import functools
 from flask import Blueprint,session,abort,render_template,redirect,jsonify,request
 

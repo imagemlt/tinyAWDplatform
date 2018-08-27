@@ -74,7 +74,7 @@ class DockerManage(object):
                         'chalid':chal['id'],
                         'ip':self.config['network_prefix']+'.'+str(teamid)+'.'+str(chal['id']),
                         'teamid':teamid,
-                        'password':str(uuid.uuid1()),
+                        'password':str(uuid.uuid4()),
                         'status':container.status
                     }
                     self.instances.append(instance)
@@ -107,9 +107,9 @@ class DockerManage(object):
     def chpass(self,instid,password):
         try:
             instance = json.loads(redis_store.hget('instances', instid))
-            self.containers[instid].exec_run("password=$(openssl passwd -1 -salt 'abcdefg' '%s') && sed -i 's/^%s:!/%s:'$password'/g' /etc/shadow"%(password,self.config['ssh_user'],self.config['ssh_user']), detach=True)
+            self.containers[instid].exec_run("/bin/bash -c 'echo %s:%s|chpasswd'"%(self.config['ssh_user'],password), detach=True)
             instance['password']=password
-            self.hset('instances', instid, json.dumps(instance))
+            redis_store.hset('instances', instid, json.dumps(instance))
         except Exception, e:
             print '[-]%s' % str(e)
 
@@ -199,6 +199,9 @@ class DockerManage(object):
                 print '[-]%s'%str(e)
         redis_store.expire('flags',self.config['expire'])
 
+    def is_stopped(self):
+        return self.stopped
+
 
 
 class RedisQueue(object):
@@ -237,7 +240,6 @@ if __name__=='__main__':
                 print '[+]time to update flags'
                 docker_manage.update_flag()
                 time_begin=datetime.datetime.now()
-            print (time_end-time_begin).seconds
             if not data:
                 continue
             info=json.loads(data[1])
@@ -277,6 +279,7 @@ if __name__=='__main__':
             except:
                 pass
             continue
-    if not DockerManage.stopped:
+    if not docker_manage.is_stopped():
         docker_manage.destroy()
     print "[-]ended"
+    #redis_store.flushall()

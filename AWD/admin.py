@@ -19,6 +19,36 @@ def is_admin(func):
         return func(*args,**kargs)
     return wrapper
 
+def load_to_redis():
+    chals=Challenges.query.all()
+    teams=db.session.query(Teams).join(Origin).all()
+    chals_dict={}
+    teams_dict={}
+    for chal in chals:
+        chals_dict[chal.id]=json.dumps({
+            'id': chal.id,
+            'name': chal.name,
+            'dockername': chal.dockername,
+            'type': chal.type,
+            'score': chal.score,
+            'command': chal.command,
+            'flagcommand': chal.flagcommand,
+            'desc': chal.desc
+        })
+    if len(chals_dict):
+        redis_store.hmset('chals',chals_dict)
+    for team in teams:
+        teams_dict[team.id]=json.dumps({
+            'id': team.id,
+            'name': team.name,
+            'nickname': team.nickname,
+            'score': team.score,
+            'password': team.origin_pass[0].password,
+            'instances': []
+        })
+    if len(teams_dict):
+        redis_store.hmset('teams',teams_dict)
+
 @admin.route('/admin')
 def admin_index():
     return render_template('/admin/index.html')
@@ -328,6 +358,8 @@ def get_all_instances():
     instances=redis_store.hgetall('instances')
     ans=[]
     counter=0
+    if(len(instances)==0):
+        load_to_redis()
     for inst in instances:
         if counter<(page-1)*20:
             counter+=1

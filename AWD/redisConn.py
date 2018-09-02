@@ -1,5 +1,4 @@
-from flask.ext.redis import FlaskRedis
-
+from flask_redis import FlaskRedis
 redis_store=FlaskRedis()
 
 

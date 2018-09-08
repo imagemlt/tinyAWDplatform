@@ -33,6 +33,7 @@ python docker_serv.py
 ### 题目镜像要求
 
 * 开放ssh服务，并添加`config.py`中指定的user
-* 提供启动指令与更新flag指令
+* 提供启动指令与更新flag指令,其中更新flag指令中flag可以写`flag{test}`，程序运行中将替换为flag，例：
+`/bin/bash -c "echo flag{test}>/flag"`
 
 

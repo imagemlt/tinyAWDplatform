@@ -6,7 +6,7 @@
 * docker-py
 * flask
 * redis
-* vue+elementui
+* vue+elementui（后台与用户界面均基于[https://github.com/taylorchen709/vue-admin](https://github.com/taylorchen709/vue-admin)）
 
 
 ### 依赖：

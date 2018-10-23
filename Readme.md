@@ -36,4 +36,8 @@ python docker_serv.py
 * 提供启动指令与更新flag指令,其中更新flag指令中flag可以写`flag{test}`，程序运行中将替换为flag，例：
 `/bin/bash -c "echo flag{test}>/flag"`
 
+### tips
+
+* 目前版本尽量不要同一浏览器内同时登录管理员和用户
+* 由于某些队伍界面的接口直接从redis中获取数据，所以服务启动后请先登录管理员
 

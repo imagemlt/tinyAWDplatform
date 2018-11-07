@@ -224,13 +224,14 @@ class RedisQueue(object):
 
 
 if __name__=='__main__':
+
     docker_manage=DockerManage(docker_config)
     #docker_manage.build_subnet()
     '''
     TODO
     '''
     redis_queue=RedisQueue('docker_message')
-
+    print "[+]redis connection initialized"
     time_begin=datetime.datetime.now()
     while True:
         try:

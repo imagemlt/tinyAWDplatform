@@ -29,6 +29,7 @@ python docker_serv.py
 ```
 启动docker管理进程
 * 访问`/init_a_manager`可生成一个管理员帐号，具体根据`AWD/__init__.py`中修改
+* 访问`/admin`即可登录，之后可添加用户等等
 
 ### 题目镜像要求
 

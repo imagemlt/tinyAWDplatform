@@ -20,15 +20,6 @@ def create_app(config):
     CSRFProtect(app)
     for m in blueprint_list:
         app.register_blueprint(m)
-    @app.route('/init_a_manager')
-    def index():
-        md5 = hashlib.md5()
-        md5.update('xxx')
-        pwd = md5.hexdigest()
-        admin = Admin('imagemlt', pwd)
-        db.session.add(admin)
-        db.session.commit()
-        return '<h1>this is index</h1>'
     @app.after_request
     def after_request(response):
         csrf_token=generate_csrf()

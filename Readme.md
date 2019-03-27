@@ -14,7 +14,7 @@
 * flask_wtf
 * flask_redis
 * redis
-* docker-py
+* docker
 
 ### 使用方法
 

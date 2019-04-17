@@ -36,7 +36,7 @@ python docker_serv.py
 * 开放ssh服务，并添加`config.py`中指定的user
 * 提供启动指令与更新flag指令,启动指令默认为空，只针对某些特殊镜像使用；其中更新flag指令中flag可以写`flag{test}`，程序运行中将替换为flag，例：
 `/bin/bash -c "echo flag{test}>/flag"`
-* 镜像可以参考2017年ciscn buildit的模板[https://github.com/CyberPeace/ciscn2018-template](https://github.com/CyberPeace/ciscn2018-template)
+* 镜像可以参考2018年ciscn buildit的模板[https://github.com/CyberPeace/ciscn2018-template](https://github.com/CyberPeace/ciscn2018-template)
 
 ### tips
 

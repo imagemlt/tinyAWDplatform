@@ -37,6 +37,7 @@ python docker_serv.py
 * 提供启动指令与更新flag指令,启动指令默认为空，只针对某些特殊镜像使用；其中更新flag指令中flag可以写`flag{test}`，程序运行中将替换为flag，例：
 `/bin/bash -c "echo flag{test}>/flag"`
 * 镜像中起ssh服务的操作方法可以参考2018年ciscn buildit的模板[https://github.com/CyberPeace/ciscn2018-template](https://github.com/CyberPeace/ciscn2018-template)
+* 建议镜像最好可以直接不用添加命令参数启动，具体参考[这个烂尾了的项目里面的写法](https://github.com/imagemlt/CTF_web_dockers)
 
 ### tips
 

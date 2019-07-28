@@ -5,3 +5,4 @@ Flask_SQLAlchemy==2.3.2
 Flask==1.0.2
 docker==3.7.1
 Flask_And_Redis==1.0.0
+flask_redis==latest

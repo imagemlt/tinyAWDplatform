@@ -44,8 +44,11 @@ def load_to_redis():
             'nickname': team.nickname,
             'score': team.score,
             'password': team.origin_pass[0].password,
+            'attackid':team.attackid,
             'instances': []
         })
+    if not redis_store.hget('attackpack',team.attackid):
+        redis_store.hset('attackpack',team.attackid,team.id)
     if len(teams_dict):
         redis_store.hmset('teams',teams_dict)
 
@@ -195,6 +198,7 @@ def add_chal():
     Chal.desc=request.form.get('desc')
     db.session.add(Chal)
     db.session.commit()
+    print Chal.dockername
     redis_store.hset('chals',Chal.id,json.dumps({
         'id': Chal.id,
         'name': Chal.name,
@@ -410,7 +414,7 @@ def inst_restart():
 @is_admin
 def inst_chpass():
     instid=request.form['id']
-    inst=redis_store.hget('instances',instid)
+    inst=json.loads(redis_store.hget('instances',instid))
     if not inst:
         return abort(404)
     connect_queue=RedisQueue('docker_message')
@@ -529,6 +533,7 @@ def getteams():
                 'nickname':team.nickname,
                 'score':team.score,
                 'password':team.origin_pass[0].password,
+                'attackid':team.attackid,
                 'instances':[]
             }
             ans.append(json_team)
@@ -609,6 +614,7 @@ def add_team():
     team=Teams(request.form['name'],pwd)
     team.nickname=request.form['nickname']
     team.score=10000
+    team.attackid=str(uuid.uuid4())
     db.session.add(team)
     db.session.commit()
     origin_pass=Origin()
@@ -622,10 +628,12 @@ def add_team():
         'nickname':team.nickname,
         'password':origin_pass.password,
         'score':team.score,
-        'instances':[]
+        'instances':[],
+        'attackid':team.attackid
     }))
+    redis_store.hset('attackpack',team.attackid,team.id)
     return jsonify({
-        'code':200,
+        'code':200, 
         'msg':"添加成功",
         'type':"success"
     })
@@ -664,6 +672,7 @@ def changeteam():
         'nickname': team.nickname,
         'password': origin_pass.password,
         'score': team_in_redis['score'],
+        'attackid':team_in_redis['attackid'],
         'instances':team_in_redis['instances']
     }))
     return jsonify({

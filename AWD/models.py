@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+import uuid
 
 db=SQLAlchemy()
 
@@ -76,6 +77,7 @@ class Teams(db.Model):
     nickname=db.Column(db.String(32))
     score=db.Column(db.Integer)
     password=db.Column(db.String(128))
+    attackid=db.Column(db.String(128),default=str(uuid.uuid4()))
     instances=db.relationship('Instances',backref='team')
     origin_pass=db.relationship('Origin',backref='team')
 
@@ -153,6 +155,7 @@ class Instances(db.Model):
     uid=db.Column(db.Integer,db.ForeignKey('teams.id'))
     chalid=db.Column(db.Integer,db.ForeignKey('challenges.id'))
     ssh_key=db.Column(db.String(128))
+    status=db.Column(db.String(10),default='stable')
 
     def __init__(self,name):
         self.instancename=name

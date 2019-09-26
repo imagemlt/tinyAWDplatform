@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from flask import Blueprint,request,jsonify
 from models import *
-from redisConn import redis_store
+from redisConn import redis_store,RedisQueue
 import json
 
 flag=Blueprint('flag',__name__)
@@ -16,7 +16,10 @@ def treatflag():
     #flag查询结果
     result=redis_store.hget('flags',flag)
     #攻击方查询结果
-    attack=redis_store.hget('teams',fr)
+    attackerid=redis_store.hget('attackpack',fr)
+    if not attackerid:
+        return jsonify({"status":"fail"})
+    attack=redis_store.hget('teams',attackerid)
     if not result or not attack:
         return jsonify({"status":"fail"})
     if redis_store.get(fr+flag):
@@ -32,16 +35,30 @@ def treatflag():
     #获取被攻击队伍的信息
     attacked=json.loads(redis_store.hget('teams',flagInfo['teamid']))
     print attacked,attacker
-    #攻击方加分，被攻击方减分
-    attacker['score']=attacker['score']+chal['score']
-    attacked['score']=attacked['score']-chal['score']
+    
+    connect_queue=RedisQueue('flag_message')
+    connect_queue.put(json.dumps({
+        'command':'add',
+        'score':chal['score'],
+        'teamid':attacker['id']
+    }))
+    connect_queue.put(json.dumps({
+        'command':'sub',
+        'score':chal['score'],
+        'teamid':attacked['id']
+    }))
     print attacked,attacker
     ttl=redis_store.ttl('flags')
     redis_store.set(fr+flag,1)
     redis_store.expire(fr+flag,ttl)
+
+    instance=json.loads(redis_store.hget('instances',flagInfo['instid']))
+    if instance['attack_status']=='stable':
+        instance['attack_status']='attacked'
+    elif instance['attack_status']=='down':
+        instance['attack_status']='d/a'
+    redis_store.hset('instances',flagInfo['instid'],json.dumps(instance))
     #写回数据到redis中
-    redis_store.hset('teams',attacker['id'],json.dumps(attacker))
-    redis_store.hset('teams',attacked['id'],json.dumps(attacked))
     redis_store.rpush('attack',json.dumps({
         'attacker':attacker['id'],
         'attacked':attacked['id'],

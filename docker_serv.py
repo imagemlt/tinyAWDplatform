@@ -61,10 +61,16 @@ class DockerManage(object):
                 try:
                     if chal['command'] is not None and chal['command'].strip()=='':
                         chal['command']=None
-                    container=self.docker_client.containers.create(chal['dockername'],
+                    if chal['command'] is not None:
+                        container=self.docker_client.containers.create(chal['dockername'],
                                                                    name=self.config['network_name']+'_'+chal['name']+'_team_'+str(teamid),
                                                                    command=chal['command'],
                                                                    detach=True)
+                    else:
+                        print 'no need to use parameters'
+                        container=self.docker_client.containers.create(chal['dockername'],
+                                                                   name=self.config['network_name']+'_'+chal['name']+'_team_'+str(teamid),                                                                  
+                                                                   detach=True)                                             
                     self.network.connect(container,
                                          ipv4_address=self.config['network_prefix']+'.'+str(teamid)+'.'+str(chal['id']))
                     self.containers.append(container)
@@ -75,7 +81,8 @@ class DockerManage(object):
                         'ip':self.config['network_prefix']+'.'+str(teamid)+'.'+str(chal['id']),
                         'teamid':teamid,
                         'password':str(uuid.uuid4()),
-                        'status':container.status
+                        'status':container.status,
+                        'attack_status':'stable'
                     }
                     self.instances.append(instance)
                     redis_store.hset('instances',instanceid,json.dumps(instance))
@@ -110,6 +117,7 @@ class DockerManage(object):
             self.containers[instid].exec_run("/bin/bash -c 'echo %s:%s|chpasswd'"%(self.config['ssh_user'],password), detach=True)
             instance['password']=password
             redis_store.hset('instances', instid, json.dumps(instance))
+            print 'chpass success'
         except Exception, e:
             print '[-]%s' % str(e)
 
@@ -140,6 +148,7 @@ class DockerManage(object):
                                  ipv4_address=instance['ip'])
             self.containers[instid].start()
             instance['status']=self.containers[instid].status
+            instance['attack_status']='stable'
             redis_store.hset('instances',instid,json.dumps(instance))
             return {'status':'success'}
         except Exception,e:
@@ -194,7 +203,9 @@ class DockerManage(object):
                 chal=json.loads(redis_store.hget('chals',instance['chalid']))
                 flag=self.config['flag_prefix']+'{'+str(uuid.uuid4())+'}'
                 self.containers[instid].exec_run(chal['flagcommand'].replace('flag{test}',flag),detach=True)
-                redis_store.hset('flags',flag,json.dumps({'teamid':instance['teamid'],'chalid':instance['chalid']}))
+                redis_store.hset('flags',flag,json.dumps({'teamid':instance['teamid'],'chalid':instance['chalid'],'instid':instid}))
+                instance['attack_status']='stable'
+                redis_store.hset('instances',instid,json.dumps(instance))
             except Exception,e:
                 print '[-]%s'%str(e)
         redis_store.expire('flags',self.config['expire'])
@@ -263,6 +274,9 @@ if __name__=='__main__':
             elif info['command']=='pause':
                 pass
                 #docker_manage.pause(info['id'])
+            elif info['command']=='chpass':
+                docker_manage.chpass(info['id'],str(uuid.uuid4()))
+                redis_store.set(info['mark'],'success')
             elif info['command']=='pause_all':
                 docker_manage.pause_all()
                 redis_store.set(info['mark'],'success')

@@ -56,13 +56,15 @@ def team_login():
     else:
         return render_template('/teams/index.html')
 
-
+@login_required
 @teams.route('/team/info')
 def team_info():
     team=json.loads(redis_store.hget('teams',session['user']['id']))
     if not team:
         abort(404)
-    ans={'id':team['id'],'name':team['name'],'nickname':team['nickname'],'score':team['score']}
+    if not redis_store.hget('attackpack',team['attackid']):
+        redis_store.hset('attackpack',team['attackid'],team['id'])
+    ans={'id':team['id'],'name':team['name'],'nickname':team['nickname'],'score':team['score'],'attackid':team['attackid']}
     return jsonify({
         'user':ans
     })
@@ -154,9 +156,17 @@ def team_list():
                 'nickname': team.nickname,
                 'score': team.score,
                 'password': team.origin_pass[0].password,
+                'attackid':team.attackid,
                 'instances':[]
             }
-            ans.append(json_team)
+            if not redis_store.hget('attackpack',team.attackid):
+                redis_store.hset('attackpack',team.attackid,team.id)
+            ans.append({
+                'id': team.id,
+                'name': team.name,
+                'nickname': team.nickname,
+                'score': team.score
+            })
             result_in_json[team.id] = json.dumps(json_team)
         redis_store.hmset('teams', result_in_json)
     else:
@@ -176,8 +186,7 @@ def team_list():
                 'id': team['id'],
                 'name': team['name'],
                 'nickname': team['nickname'],
-                'score': team['score'],
-                'password': team['password']
+                'score': team['score']
             })
             if has_page and len(ans) == 20:
                 break
@@ -268,7 +277,9 @@ def chals():
 def attack_record():
     if not session.has_key("record"):
         session["record"]=0
+    print session['record']
     record=redis_store.lrange("attack",session["record"],-1)
+    print record
     ans=[]
     for rec in record:
         ans.append(json.loads(rec))

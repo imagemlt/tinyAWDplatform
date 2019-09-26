@@ -28,6 +28,11 @@ python serve.py
 python docker_serv.py
 ```
 启动docker管理进程
+* 运行
+```bash
+python flag_serv.py
+```
+启动flag服务进程
 * 运行 `python manager.py init_manager username password`可添加一个管理员账号
 * 访问`/admin`即可登录，之后可添加用户等等
 

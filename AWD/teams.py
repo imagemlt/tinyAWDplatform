@@ -214,6 +214,7 @@ def team_instances():
             'chalname': chal['name'],
             'ip': inst['ip'],
             'status': inst['status'],
+            'attack_status':inst['attack_status'],
             'password': inst['password']
         })
     return jsonify({

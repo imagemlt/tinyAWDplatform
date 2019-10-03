@@ -48,6 +48,10 @@ python flag_serv.py
 * 镜像中起ssh服务的操作方法可以参考2018年ciscn buildit的模板[https://github.com/CyberPeace/ciscn2018-template](https://github.com/CyberPeace/ciscn2018-template)
 * 建议镜像最好可以直接不用添加命令参数启动
 
+### flag提交接口
+
+请求`/flag?from=攻击id&flag=YOUR FLAG`即可，其中攻击id为登陆后个人信息栏的攻击id
+
 ### tips
 
 * 目前版本尽量不要同一浏览器内同时登录管理员和用户

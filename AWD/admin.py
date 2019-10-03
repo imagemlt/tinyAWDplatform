@@ -190,7 +190,7 @@ def add_chal():
         })
     chalname=request.form.get('name')
     chaltype=request.form.get('type')
-    dockername=request.form.get('docker')
+    dockername=request.form.get('dockername')
     score=request.form.get('score')
     Chal=Challenges(chalname,dockername,chaltype,score)
     Chal.command=request.form.get('command')

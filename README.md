@@ -22,7 +22,10 @@
 ```bash
 python serve.py
 ```
-启动web服务
+启动web服务，或者使用gunicorn启动：
+```
+gunicorn -b 127.0.0.1:5000 serve:app
+```
 * 运行
 ```bash
 python docker_serv.py

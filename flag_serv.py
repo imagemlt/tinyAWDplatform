@@ -45,6 +45,8 @@ if __name__=='__main__':
     while True:
         try:
             data=(redis_queue.get_wait(timeout=10))
+            if not data:
+                continue
             info=json.loads(data[1])
             print info
             print info['command']

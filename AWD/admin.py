@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import hashlib
 from models import *
+from utils import get_short_id
 import functools
 from redisConn import redis_store,RedisQueue
 import json
@@ -269,6 +270,8 @@ def delete_chal():
         return abort(404)
     db.session.delete(chal)
     db.session.commit()
+    if redis_store.hget('chals',request.form['id']):
+        redis_store.hdel('chals',request.form['id'])
     return jsonify({
         'code':200,
         'msg':'删除成功',
@@ -614,7 +617,11 @@ def add_team():
     team=Teams(request.form['name'],pwd)
     team.nickname=request.form['nickname']
     team.score=10000
-    team.attackid=str(uuid.uuid4())
+    while True:
+    	attackid=get_short_id()
+        if redis_store.hget('attackpack',attackid) is None:
+		break
+    team.attackid=attackid
     db.session.add(team)
     db.session.commit()
     origin_pass=Origin()
@@ -690,3 +697,4 @@ def team_logout():
         'code':200,
         'msg':'已注销登录'
     })
+

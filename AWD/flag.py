@@ -31,10 +31,8 @@ def treatflag():
         return jsonify({"status":"fail"})
     #获取题目信息
     chal=json.loads(redis_store.hget('chals',flagInfo['chalid']))
-    print chal
     #获取被攻击队伍的信息
     attacked=json.loads(redis_store.hget('teams',flagInfo['teamid']))
-    print attacked,attacker
     
     connect_queue=RedisQueue('flag_message')
     connect_queue.put(json.dumps({
@@ -47,7 +45,6 @@ def treatflag():
         'score':chal['score'],
         'teamid':attacked['id']
     }))
-    print attacked,attacker
     ttl=redis_store.ttl('flags')
     redis_store.set(fr+flag,1)
     redis_store.expire(fr+flag,ttl)

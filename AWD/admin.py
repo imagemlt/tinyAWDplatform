@@ -145,8 +145,6 @@ def admin_edit():
         return abort(404)
     admin2 = Admin.query.filter(Admin.name == request.form.get('name')).first()
     if admin2 and admin2.id != admin.id:
-        print admin2.id
-        print request.form.get('id')
         return jsonify({
             'code':500,
             'msg': '编辑失败:用户名已存在',
@@ -199,7 +197,6 @@ def add_chal():
     Chal.desc=request.form.get('desc')
     db.session.add(Chal)
     db.session.commit()
-    print Chal.dockername
     redis_store.hset('chals',Chal.id,json.dumps({
         'id': Chal.id,
         'name': Chal.name,
@@ -321,7 +318,6 @@ def chals():
             }
             ans.append(chal_json)
             result_json[chal.id]=json.dumps(chal_json)
-        #print len(result_json)
         if len(result_json):
             redis_store.hmset('chals',result_json)
     else:
@@ -333,7 +329,6 @@ def chals():
             has_page=False
         counter=0
         for chalid in chals_in_redis:
-            print chalid
             if has_page and counter<(page-1)*20:
                 counter+=1
                 continue
@@ -403,7 +398,6 @@ def inst_restart():
     connect_queue.put(json.dumps({'command':'restart','id':inst['id'],'mark':mark}))
     if not session.has_key('messids'):
         session['messids']=[]
-    print mark
     messids=session['messids']
     messids.append(mark)
     session['messids']=messids
@@ -440,7 +434,6 @@ def inst_chpass():
 def inst_restart_status():
     messid=request.args['id']
     ids=session['messids']
-    print ids
     if messid not in ids:
         return abort(403)
     data=(redis_store.get(messid))
@@ -529,7 +522,6 @@ def getteams():
         else:
             teams=db.session.query(Teams).join(Origin).all()
         for team in teams:
-            print len(team.origin_pass)
             json_team={
                 'id':team.id,
                 'name':team.name,

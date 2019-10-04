@@ -149,7 +149,6 @@ def team_list():
         else:
             teams = db.session.query(Teams).join(Origin).all()
         for team in teams:
-            print len(team.origin_pass)
             json_team = {
                 'id': team.id,
                 'name': team.name,
@@ -259,7 +258,6 @@ def chals():
             has_page=False
         counter=0
         for chalid in chals_in_redis:
-            print chalid
             if has_page and counter<(page-1)*20:
                 counter+=1
                 continue
@@ -278,9 +276,7 @@ def chals():
 def attack_record():
     if not session.has_key("record"):
         session["record"]=0
-    print session['record']
     record=redis_store.lrange("attack",session["record"],-1)
-    print record
     ans=[]
     for rec in record:
         ans.append(json.loads(rec))

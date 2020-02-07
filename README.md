@@ -55,7 +55,7 @@ python flag_serv.py
 ### 配置文件说明
 
 配置文件位于`config.py`,需要修改的地方有：
-* SECRET_KEY, 使用默认值可能会被伪造
+* SECRET_KEY, 使用默认值可能会导致cookie伪造等。
 ```
 SECRET_KEY = os.environ.get('SECRET_KEY') or '\xb1\xca\xb2\x00P\xd0\x14#\xff0\xe50d\x88\xc3\xf5\xcc\x90W!\x96\xf8%U'
 ```
@@ -63,7 +63,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY') or '\xb1\xca\xb2\x00P\xd0\x14#\xff0\xe
 ```
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///{}/ctfd.db'.format(basedir)
 ```
-* redis连接地址,尽量添加密码以防未授权访问
+* redis连接地址,最好为redis添加密码以防未授权访问
 ```
  REDIS_URL='redis://localhost:6379/0'
 ```
